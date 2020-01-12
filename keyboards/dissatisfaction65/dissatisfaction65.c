@@ -14,14 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "dissatisfaction65.h"
-//#include <math.h>
+#include <math.h>
 #include "quantum.h"
 
 #include "analog.h"
 
-// float calc_percent_bat(float voltage) {
-//     return 100 * (1.07 + (.01 - 1.07) / pow(1 + pow(voltage / 3.68, 60.66), .34));
-// }
+float calc_percent_bat(float voltage) {
+    return 100 * (1.07 + (.01 - 1.07) / pow(1 + pow(voltage / 3.68, 60.66), .34));
+}
 
 void matrix_init_kb(void) {
 	// put your keyboard start-up code here
@@ -41,11 +41,17 @@ void matrix_scan_kb(void) {
 	matrix_scan_user();
 }
 
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  debug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
+}
+
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 	// put your per-action keyboard code here
 	// runs for every action, just before processing by the firmware
-
-    uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
 
 	return process_record_user(keycode, record);
 }
@@ -69,7 +75,7 @@ void oled_task_user(void) {
     measuredvbat *= 3.3;  // Multiply by 3.3V, our reference voltage
     measuredvbat /= 1024; // convert to voltage
     char vbatchar[10];
-    dtostrf(1.1, 4, 2, vbatchar); //calc_percent_bat(measuredvbat)
+    dtostrf(calc_percent_bat(measuredvbat), 4, 2, vbatchar); //calc_percent_bat(measuredvbat)
 
     oled_write(vbatchar, false);
 }

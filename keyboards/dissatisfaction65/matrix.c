@@ -102,9 +102,6 @@ uint8_t matrix_cols(void)
 
 void matrix_init(void)
 {
-    debug_enable = true;
-    debug_matrix = true;
-    debug_mouse = true;
     // initialize row and col
     unselect_cols();
     init_rows();
@@ -115,10 +112,11 @@ void matrix_init(void)
         matrix_debouncing[i] = 0;
     }
 
-    //set global enable on MUX on. In this case set C6 to OUTput a LOW signal (look up spec sheet)
+    //set global enable on MUX on.
     uint8_t g_enable_1 = g_pins[0];
-    _SFR_IO8((g_enable_1 >> 4) + 1) |= _BV(g_enable_1 & 0xF); // mode C6 OUT
-    _SFR_IO8((g_enable_1 >> 4) + 2) |= _BV(g_enable_1 & 0xF); // set C6's output to HIGH
+
+    setPinOutput(g_enable_1);
+    writePinHigh(g_enable_1);
 
     matrix_init_quantum();
 
@@ -202,8 +200,8 @@ static void init_rows(void)
 {
     for(uint8_t x = 0; x < MATRIX_ROWS; x++) {
         uint8_t pin = row_pins[x];
-        _SFR_IO8((pin >> 4) + 1) &= ~_BV(pin & 0xF); // IN
-        _SFR_IO8((pin >> 4) + 2) |=  _BV(pin & 0xF); // HIGH
+
+        setPinInputHigh(pin);
     }
 }
 
@@ -213,7 +211,7 @@ static bool read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
 
     // Select col and wait for col selection to stabilize
     select_col(current_col);
-    wait_us(5);
+    wait_us(30);
 
     // For each row...
     for(uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++)
@@ -223,7 +221,7 @@ static bool read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
         matrix_row_t last_row_value = current_matrix[row_index];
 
         // Check row pin state
-        if ((_SFR_IO8(row_pins[row_index] >> 4) & _BV(row_pins[row_index] & 0xF)) == 0)
+        if (readPin(row_pins[row_index]) == 0)
         {
             // Pin LO, set col bit
             current_matrix[row_index] |= (ROW_SHIFTER << current_col);
@@ -252,16 +250,16 @@ static void select_col(uint8_t col)
 
     //global enable Pins for allowing/disabling inputs (look up 74HC154 truth table)
     uint8_t g_enable_2 = g_pins[1];
-    _SFR_IO8((g_enable_2 >> 4) + 1) |=  _BV(g_enable_2 & 0xF); // set pin to be OUT (to send signal to MUX)
-    _SFR_IO8((g_enable_2 >> 4) + 2) &= ~_BV(g_enable_2 & 0xF); // LOW
+    setPinOutput(g_enable_2);
+    writePinLow(g_enable_2);
 
     for(uint8_t x = 0; x < 4; x++) {
         uint8_t pin = col_pins[x];
-        _SFR_IO8((pin >> 4) + 1) |= _BV(pin & 0xF); // OUT
+        setPinOutput(pin);
         if (((col >> x) & 0x1) == 1){
-            _SFR_IO8((pin >> 4) + 2) |=  _BV(pin & 0xF); // HIGH
+            writePinHigh(pin);
         } else {
-            _SFR_IO8((pin >> 4) + 2) &=  ~_BV(pin & 0xF); // LOW
+            writePinLow(pin);
         }
     }
 }
@@ -270,6 +268,6 @@ static void unselect_cols(void)
 {
     //global disable Pins for allowing/disabling inputs (look up 74HC154 truth table)
     uint8_t g_enable_2 = g_pins[1];
-    _SFR_IO8((g_enable_2 >> 4) + 1) |=  _BV(g_enable_2 & 0xF); // set pin to be OUT (to send signal to MUX)
-    _SFR_IO8((g_enable_2 >> 4) + 2) |= _BV(g_enable_2 & 0xF); // HIGH
+    setPinOutput(g_enable_2);
+    writePinHigh(g_enable_2);
 }
