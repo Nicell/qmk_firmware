@@ -38,8 +38,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COL_PINS { F7, F6, F4, F5 }
 #define MUX_ENABLES { F1, C7 }
 
-#define ENCODERS_PAD_A { D2 }
-#define ENCODERS_PAD_B { D3 }
+#define ENCODERS_PAD_A { D3 }
+#define ENCODERS_PAD_B { D2 }
+
+#define ENCODER_SW F0
+
+#define BATTERY_LEVEL_PIN B5
+
+#define ENCODER_RESOLUTION 4
+
+//#define NO_ACTION_TAPPING
+#define NO_ACTION_ONESHOT
 
 #undef I2C_ADDRESS_SA0_1
 #define I2C_ADDRESS_SA0_1 0b0111100

@@ -118,6 +118,8 @@ void matrix_init(void)
     setPinOutput(g_enable_1);
     writePinHigh(g_enable_1);
 
+    setPinInputHigh(ENCODER_SW);
+
     matrix_init_quantum();
 
 }
@@ -230,6 +232,12 @@ static bool read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
         {
             // Pin HI, clear col bit
             current_matrix[row_index] &= ~(ROW_SHIFTER << current_col);
+        }
+
+        if (row_index == 0 && current_col == 14) {
+            if (!readPin(ENCODER_SW)) {
+                current_matrix[row_index] |= (ROW_SHIFTER << current_col);
+            }
         }
 
         // Determine if the matrix changed state

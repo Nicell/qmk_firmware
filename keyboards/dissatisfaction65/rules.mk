@@ -17,19 +17,22 @@ BOOTLOADER = caterina
 # Build Options
 #   change yes to no to disable
 #
-BOOTMAGIC_ENABLE = no      # Virtual DIP switch configuration(+1000)
+BOOTMAGIC_ENABLE = lite      # Virtual DIP switch configuration(+1000)
 MOUSEKEY_ENABLE = no       # Mouse keys(+4700)
 EXTRAKEY_ENABLE = yes       # Audio control and System control(+450)
-CONSOLE_ENABLE = yes        # Console for debug(+400)
-COMMAND_ENABLE = yes        # Commands for debug and configuration
+CONSOLE_ENABLE = no         # Console for debug(+400)
+COMMAND_ENABLE = no         # Commands for debug and configuration
 # if this doesn't work, see here: https://github.com/tmk/tmk_keyboard/wiki/FAQ#nkro-doesnt-work
 NKRO_ENABLE = no            # USB Nkey Rollover
 UNICODE_ENABLE = no         # Unicode
 BLUETOOTH_ENABLE = no
 BLUETOOTH = AdafruitBLE
 ENCODER_ENABLE = yes
-OLED_DRIVER_ENABLE = no
+QWIIC_ENABLE += MICRO_OLED
+SPACE_CADET_ENABLE = no
+MAGIC_ENABLE = no
+LTO_ENABLE = yes
 
 CUSTOM_MATRIX = yes
 
-SRC += matrix.c #analog.c
+SRC += matrix.c analog.c
