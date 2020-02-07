@@ -220,7 +220,9 @@ void draw_display(void) {
     oled_time = timer_read32();
 
     if (oled_off) {
-        init_oled();
+        send_command(DISPLAYON);
+        oled_time = timer_read32();
+        oled_off = false;
     }
 
     draw_keyboard_matrix();
@@ -230,10 +232,6 @@ void draw_display(void) {
     draw_enc_mode();
 
     send_buffer();
-
-    if (oled_off) {
-        oled_off = false;
-    }
 }
 
 void matrix_scan_kb(void) {
@@ -248,8 +246,7 @@ void matrix_scan_kb(void) {
         }
 
         if (timer_elapsed32(oled_time) > OLED_TIMEOUT) {
-            clear_buffer();
-            send_buffer();
+            send_command(DISPLAYOFF);  // 0xAE
             oled_off = true;
         }
     }
